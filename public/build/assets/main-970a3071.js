@@ -1,0 +1,1 @@
+$(function(){$("#slider-range").slider({range:!0,min:0,max:2500,values:[10,2500],slide:function(a,e){$("#amount").val("$"+e.values[0]+" - $"+e.values[1])}}),$("#amount").val("$"+$("#slider-range").slider("values",0)+" - $"+$("#slider-range").slider("values",1))});

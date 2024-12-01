@@ -1,0 +1,32 @@
+{
+  "resources/js/app.js": {
+    "file": "assets/app-cee1c8b9.js",
+    "isEntry": true,
+    "src": "resources/js/app.js"
+  },
+  "resources/sass/app.scss": {
+    "file": "assets/app-27abf3b7.css",
+    "isEntry": true,
+    "src": "resources/sass/app.scss"
+  },
+  "resources/views/themes/indotoko/assets/css/main.css": {
+    "file": "assets/main-64e8ac24.css",
+    "isEntry": true,
+    "src": "resources/views/themes/indotoko/assets/css/main.css"
+  },
+  "resources/views/themes/indotoko/assets/js/main.js": {
+    "file": "assets/main-970a3071.js",
+    "isEntry": true,
+    "src": "resources/views/themes/indotoko/assets/js/main.js"
+  },
+  "resources/views/themes/indotoko/assets/plugins/jqueryui/jquery-ui.css": {
+    "file": "assets/jquery-ui-875f2a08.css",
+    "isEntry": true,
+    "src": "resources/views/themes/indotoko/assets/plugins/jqueryui/jquery-ui.css"
+  },
+  "resources/views/themes/indotoko/assets/plugins/jqueryui/jquery-ui.min.js": {
+    "file": "assets/jquery-ui.min-379d25bb.js",
+    "isEntry": true,
+    "src": "resources/views/themes/indotoko/assets/plugins/jqueryui/jquery-ui.min.js"
+  }
+}
