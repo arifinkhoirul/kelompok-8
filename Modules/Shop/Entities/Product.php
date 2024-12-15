@@ -28,6 +28,7 @@ class Product extends Model
         'excerpt',
         'body',
         'metas',
+        'weight',
     ];
 
     protected $table = 'shop_products';
@@ -122,5 +123,14 @@ class Product extends Model
     public function getStockStatusLabelAttribute()
     {
         return self::STOCK_STATUSES[$this->stock_status];
+    }
+
+    public function getStockAttribute()
+    {
+        if (!$this->inventory) {
+            return 0;
+        }
+
+        return $this->inventory->qty;
     }
 }

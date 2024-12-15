@@ -19,7 +19,7 @@ class Attribute extends Model
     ];
 
     protected $table = 'shop_attributes';
-    
+
     public const ATTR_WEIGHT = 'ATTR_WEIGHT';
     public const ATTR_COLOR = 'ATTR_COLOR';
     public const ATTR_SIZE = 'ATTR_SIZE';
@@ -52,7 +52,7 @@ class Attribute extends Model
                 self::create([
                     'code' => $code,
                     'name' => $name,
-                    'attribute_type' => self::defaultAttributeTypes()[$code] 
+                    'attribute_type' => self::defaultAttributeTypes()[$code]
                 ]);
             }
         }
