@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 use App\Traits\Uuid;
+use App\Traits\UuidTrait;
 
 class AttributeOption extends Model
 {

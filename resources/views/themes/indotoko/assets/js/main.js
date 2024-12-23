@@ -26,6 +26,9 @@ $(function () {
         let courier = $(this).val();
         let addressID = $(".delivery-address:checked").val();
 
+        console.log(courier);
+        console.log(addressID);
+
         $.ajax({
             url: "/orders/shipping-fee",
             method: "POST",

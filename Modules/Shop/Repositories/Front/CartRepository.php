@@ -8,9 +8,10 @@ use Modules\Shop\Entities\Cart;
 use Modules\Shop\Entities\CartItem;
 use Modules\Shop\Repositories\Front\Interfaces\CartRepositoryInterface;
 
-class CartRepository implements CartRepositoryInterface {
+class CartRepository implements CartRepositoryInterface
+{
 
-    public function findByUser(User $user) : Cart
+    public function findByUser(User $user): Cart
     {
         $cart = Cart::with([
             'items',
@@ -21,6 +22,7 @@ class CartRepository implements CartRepositoryInterface {
             return Cart::create([
                 'user_id' => $user->id,
                 'expired_at' => (new Carbon())->addDay(7),
+                'tax_percent' => (env('TAX_PERCENT', 11) / 100)
             ]);
         }
 
@@ -56,9 +58,14 @@ class CartRepository implements CartRepositoryInterface {
         return $existItem;
     }
 
-    public function removeItem($id) : bool
+    public function removeItem($id): bool
     {
         return CartItem::where('id', $id)->delete();
+    }
+
+    public function clear(User $user): void
+    {
+        Cart::forUser($user)->delete();
     }
 
     public function updateQty($items = []): void
@@ -79,6 +86,7 @@ class CartRepository implements CartRepositoryInterface {
         $baseTotalPrice = 0;
         $taxAmount = 0;
         $discountAmount = 0;
+        $discountPercent = 0;
         $grandTotal = 0;
         $totalWeight = 0;
 
@@ -99,10 +107,15 @@ class CartRepository implements CartRepositoryInterface {
         $taxAmount = 0.11 * $nettTotal;
         $grandTotal = $nettTotal + $taxAmount;
 
+        if ($baseTotalPrice) {
+            $discountPercent = ($discountAmount / $baseTotalPrice) * 100;
+        }
+
         $cart->update([
             'base_total_price' => $baseTotalPrice,
             'tax_amount' => $taxAmount,
             'discount_amount' => $discountAmount,
+            'discount_percent' => $discountPercent,
             'grand_total' => $grandTotal,
             'total_weight' => $totalWeight,
         ]);

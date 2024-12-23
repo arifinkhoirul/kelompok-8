@@ -15,11 +15,13 @@ class OrderController extends Controller
 {
     protected $addressRepository;
     protected $cartRepository;
+    protected $orderRepository;
 
-    public function __construct(AddressRepositoryInterface $addressRepository, CartRepositoryInterface $cartRepository)
+    public function __construct(AddressRepositoryInterface $addressRepository, CartRepositoryInterface $cartRepository, OrderRepositoryInterface $orderRepository)
     {
         $this->addressRepository = $addressRepository;
         $this->cartRepository = $cartRepository;
+        $this->orderRepository = $orderRepository;
     }
 
     public function checkout()
@@ -28,6 +30,54 @@ class OrderController extends Controller
         $this->data['addresses'] = $this->addressRepository->findByUser(auth()->user());
 
         return $this->loadTheme('orders.checkout', $this->data);
+    }
+
+    public function store(Request $request)
+    {
+        $address = $this->addressRepository->findByID($request->get('address_id'));
+        $cart = $this->cartRepository->findByUser(auth()->user());
+        $selectedShipping = $this->getSelectedShipping($request);
+        
+        DB::beginTransaction();
+        try {
+            $order = $this->orderRepository->create($request->user(), $cart, $address, $selectedShipping);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+        DB::commit();
+
+        $this->cartRepository->clear(auth()->user());
+
+        return redirect($order->payment_url);
+    }
+
+    private function getSelectedShipping(Request $request)
+    {
+        $address = $this->addressRepository->findByID($request->get('address_id'));
+        $cart = $this->cartRepository->findByUser(auth()->user());
+
+        $availableServices = $this->calculateShippingFee($cart, $address, $request->get('courier'));
+
+        $selectedPackage = null;
+        if (!empty($availableServices)) {
+            foreach ($availableServices as $service) {
+                if ($service['service'] === $request->get('delivery_package')) {
+                    $selectedPackage = $service;
+                    continue;
+                }
+            }
+        }
+
+        if ($selectedPackage == null) {
+            return [];
+        }
+
+        return [
+            'delivery_package' => $request->get('delivery_package'),
+            'courier' => $request->get('courier'),
+            'shipping_fee' => $selectedPackage['cost'],
+        ];
     }
 
     public function shippingFee(Request $request)
@@ -67,18 +117,19 @@ class OrderController extends Controller
     }
 
 
-    private function calculateShippingFee($cart, $address, $courier) {
+    private function calculateShippingFee($cart, $address, $courier)
+    {
         $shippingFees = [];
 
         try {
             $response = Http::withHeaders([
                 'key' => env('API_ONGKIR_KEY'),
-            ])->post(env('API_ONGKIR_BASE_URL'). 'cost', [
-                'origin' => env('API_ONGKIR_ORIGIN'),
-                'destination' => $address->city,
-                'weight' => $cart->total_weight,
-                'courier' => $courier,
-            ]);
+            ])->post(env('API_ONGKIR_BASE_URL') . 'cost', [
+                        'origin' => env('API_ONGKIR_ORIGIN'),
+                        'destination' => $address->city,
+                        'weight' => $cart->total_weight,
+                        'courier' => $courier,
+                    ]);
 
             $shippingFees = json_decode($response->getBody(), true);
         } catch (\Exception $e) {
@@ -101,7 +152,8 @@ class OrderController extends Controller
                     }
                 }
             }
-        };
+        }
+        ;
         return $availableServices;
 
     }

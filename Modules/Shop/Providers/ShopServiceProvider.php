@@ -153,5 +153,10 @@ class ShopServiceProvider extends ServiceProvider
             AddressRepositoryInterface::class,
             AddressRepository::class
         );
+
+        $this->app->bind(
+            OrderRepositoryInterface::class,
+            OrderRepository::class
+        );
     }
 }
